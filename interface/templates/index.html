@@ -4,55 +4,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Upload and Display</title>
+    <title>Random Image Viewer</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        form {
             margin: 20px;
         }
 
-        input[type="file"] {
-            display: none;
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
-        label {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
+        #imageContainer {
+            margin-top: 20px;
         }
 
         img {
             max-width: 100%;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Image Upload and Display</h1>
+    <h1>Random Image Viewer</h1>
     
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <label for="file">Choose Image</label>
-        <input type="file" name="file" id="file" accept="image/*" required>
-        <input type="submit" value="Upload">
-    </form>
+    <button id="getRandomImage">Get Random Image</button>
 
-    {% if filename %}
-        <h2>Uploaded Image:</h2>
-        <img src="{{ filename }}" alt="Uploaded Image">
-    {% endif %}
+    <div id="imageContainer"></div>
+
+    <script>
+        document.getElementById('getRandomImage').addEventListener('click', function() {
+            // Make a RESTful request to the Python server to get a random image
+            fetch('http://localhost:5001/api/random_image')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const imageContainer = document.getElementById('imageContainer');
+
+                    // Create an object URL from the blob
+                    const imageUrl = URL.createObjectURL(blob);
+
+                    // Display the image
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    imgElement.alt = 'Random Image';
+
+                    // Clear previous content and append the new image
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(imgElement);
+                })
+                .catch(error => {
+                    console.error('Error fetching random image:', error);
+                });
+        });
+    </script>
 </body>
 </html>
 

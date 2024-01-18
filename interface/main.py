@@ -1,29 +1,30 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for
-import os
+from flask import Flask, render_template, jsonify
+import sqlite3
+import random
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def fetch_random_image():
+    conn = sqlite3.connect('image_database.db')
+    cursor = conn.cursor()
+
+    # Fetch a random image
+    cursor.execute('SELECT * FROM images ORDER BY RANDOM() LIMIT 1')
+    row = cursor.fetchone()
+
+    conn.close()
+
+    return row
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-
-    file = request.files['file']
-
-    if file.filename == '':
-        return redirect(request.url)
-
-    if file:
-        filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filename)
-        return redirect(url_for('index', filename=filename))
+@app.route('/api/random_image', methods=['GET'])
+def get_random_image():
+    image = fetch_random_image()
+    return jsonify({'image': image})
 
 if __name__ == '__main__':
     app.run(debug=True)
