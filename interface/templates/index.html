@@ -32,7 +32,15 @@
     
     <button id="getRandomImage">Get Random Image</button>
 
-    <div id="imageContainer"></div>
+   <div id="imageContainer"></div>
+  <div id="interfaceUploadSection">
+     <h2>Upload Image to Classify</h2>
+        <input type="file" id="interfaceImageUpload" accept="image/*">
+        <button id="classifyButton">Classify</button>
+    </div>
+    <h1>Image Classification</h1>
+    <div id="resultContainer"></div>
+
 
     <script>
         document.getElementById('getRandomImage').addEventListener('click', function() {
@@ -62,6 +70,38 @@
                 .catch(error => {
                     console.error('Error fetching random image:', error);
                 });
+        });
+         // New JavaScript code for interface image upload
+        document.getElementById('classifyButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('interfaceImageUpload');
+            const selectedFile = fileInput.files[0];
+
+            if (selectedFile) {
+                // Create a FormData object to send the file
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+
+                // Make a RESTful request to the classifier service directly
+                fetch('http://localhost:5002/api/classify_image', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Image classification response:', data);
+                                        const resultContainer = document.getElementById('resultContainer');
+                    resultContainer.innerHTML = `
+                        <p>Class: ${data.class}</p>
+                        <p>Confidence: ${data.confidence}</p>
+                    `;
+                    // Handle the classification result as needed
+                })
+                .catch(error => {
+                    console.error('Error uploading and classifying image:', error);
+                });
+            } else {
+                alert('Please select an image to classify.');
+            }
         });
     </script>
 </body>
