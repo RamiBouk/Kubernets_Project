@@ -18,7 +18,7 @@ model = tf.keras.models.load_model("models/model_1.h5")
                                              with_info=True,
                                              data_dir='data/tfds')
 
-print(ds_info)
+print(ds_info.features['label'])
 UPLOAD_FOLDER = 'upload_folder'  # Replace with the actual path to your classifier upload folder
 
 def allowed_file(filename):
@@ -29,7 +29,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Your image classification logic goes here
 def predict(x, top_k=5):
     input_shape = model.layers[0].input_shape[1:]
-    x=numpy.array(x.resize((224,224)))
+    x=numpy.array(x.resize((224,224)))/255
     if tf.is_tensor(x):
         x = tf.reshape(x[0], [1] + list(input_shape))
     elif isinstance(x, numpy.ndarray):
@@ -72,6 +72,8 @@ def classify_image():
 
         # Your image classification logic goes here
         img =Image.open(filepath)
+        print(img)
+        print(img.size)
 
         res=predict(img,3)
         print(res)
