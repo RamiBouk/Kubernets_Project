@@ -1,24 +1,24 @@
 # classifier.py
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import tensorflow_datasets as tfds
 import tensorflow as tf
 import numpy
 import os
 from PIL import Image
+import pickle
 
 
 app = Flask(__name__)
 CORS(app)
 model = tf.keras.models.load_model("models/model_1.h5")
-(_, _), ds_info = tfds.load('stanford_dogs',
-                                             split=['train', 'test'],
-                                             shuffle_files=True,
-                                             as_supervised=False,
-                                             with_info=True,
-                                             data_dir='data/tfds')
 
-print(ds_info.features['label'])
+# Load the ClassLabel object from the file
+with open('class_label.pkl', 'rb') as file:
+    loaded_class_label = pickle.load(file)
+
+# Now, loaded_class_label is the ClassLabel object
+
+
 UPLOAD_FOLDER = 'upload_folder'  # Replace with the actual path to your classifier upload folder
 
 def allowed_file(filename):
@@ -45,7 +45,7 @@ def predict(x, top_k=5):
     # display the prediction
     predictions = dict()
     for ct in range(top_k):
-        name = ds_info.features['label'].int2str(top_k_indices[0][ct])
+        name = loaded_class_label.int2str(top_k_indices[0][ct])
         name = "".join(name.split('-')[1:])
         value = top_k_pred.numpy()[0][ct]
         predictions[name] = value
@@ -72,12 +72,8 @@ def classify_image():
 
         # Your image classification logic goes here
         img =Image.open(filepath)
-        print(img)
-        print(img.size)
 
         res=predict(img,3)
-        print(res)
-        # ...
 
         # Example response (replace with actual classification result)
         result = {'class': f'{res}', 'confidence': 0.95}
