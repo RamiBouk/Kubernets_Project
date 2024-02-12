@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: classifier-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: classifier
+  template:
+    metadata:
+      labels:
+        app: classifier
+    spec:
+      containers:
+      - name: classifier-container
+        image: ramibouk/kube-project-classifier:1.0
+        ports:
+        - containerPort: 5001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: classifier-service
+spec:
+  selector:
+    app: classifier
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5001
+

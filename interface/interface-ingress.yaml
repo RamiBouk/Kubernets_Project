@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: interface-ingress
+spec:
+  rules:
+  - host: interface-app.local  # Replace with your desired hostname
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: interface-service
+            port:
+              number: 80
+

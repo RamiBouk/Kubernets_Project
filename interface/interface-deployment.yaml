@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interface-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: interface
+  template:
+    metadata:
+      labels:
+        app: interface
+    spec:
+      containers:
+      - name: interface-container
+        image: ramibouk/kube-project-interface:1.0
+        ports:
+        - containerPort: 5000
+
