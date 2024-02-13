@@ -76,7 +76,8 @@ def classify_image():
         res=predict(img,3)
 
         # Example response (replace with actual classification result)
-        result = {'class': f'{res}', 'confidence': 0.95}
+        result = {key: float(value) for key, value in res.items()}
+
 
 
         os.remove(filepath)  # Remove the uploaded image after classification
