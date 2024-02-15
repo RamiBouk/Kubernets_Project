@@ -22,12 +22,14 @@ with open('class_label.pkl', 'rb') as file:
 UPLOAD_FOLDER = 'upload_folder'  # Replace with the actual path to your classifier upload folder
 
 def allowed_file(filename):
+    print(filename)
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Your image classification logic goes here
 def predict(x, top_k=5):
+    print("predict")
     input_shape = model.layers[0].input_shape[1:]
     x=numpy.array(x.resize((224,224)))/255
     if tf.is_tensor(x):
@@ -55,17 +57,23 @@ def predict(x, top_k=5):
 
 @app.route('/api/classify_image', methods=['POST'])
 def classify_image():
+    print("classify image")
+    print(request.files['image'].filename)
     # Check if the POST request has a file part
     if 'image' not in request.files:
         return jsonify({'error': 'No image part in the request'}), 400
 
     file = request.files['image']
+    print(file)
 
     # If the user does not select a file, the browser may submit an empty file without a filename
     if file.filename == '':
+        print("no selected file")
         return jsonify({'error': 'No selected file'}), 400
 
+    print("is it allowed?")
     if file and allowed_file(file.filename):
+        print("the file is allowed")
         # Save the uploaded file
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
