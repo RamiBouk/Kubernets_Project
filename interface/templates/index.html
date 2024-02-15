@@ -4,208 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random Image Viewer</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #4caf50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-        }
-
-        #imageContainer {
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        img {
-            height: 400px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        #interfaceUploadSection {
-            margin-top: 20px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-            text-align: left;
-        }
-
-        h2 {
-            color: #333;
-        }
-
-        input[type="file"] {
-            margin-top: 10px;
-            display: none;
-        }
-
-        .custom-file-upload {
-            border: 1px solid #ccc;
-            display: inline-block;
-            padding: 6px 12px;
-            cursor: pointer;
-            background-color: #4caf50;
-            color: #fff;
-            border-radius: 4px;
-        }
-
-        #classifyButton {
-            margin-top: 10px;
-            background-color: #3498db;
-            color: #fff;
-        }
-
-        #resultContainer {
-            margin-top: 20px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        p {
-            color: #333;
-            margin: 10px 0;
-        }
-    </style>
 </head>
 <body>
-    <h1>Dog Breeds from Images</h1>
+    <h1>Random Image Viewer</h1>
     
-    <button id="getRandomImage">Try Random Image</button>
+    <button id="getRandomImage">Get Random Image</button>
 
-        <label for="interfaceImageUpload" class="custom-file-upload">Choose a File</label>
-    <input type="file" id="interfaceImageUpload" accept="image/*">
     <div id="imageContainer"></div>
 
-
-    <h1>Image Classificasltion</h1>
-    <div id="resultContainer">
-        <canvas id="chart" width="400" height="200"></canvas>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    // Function to display the image in the image container
-    function displayImage(imageUrl) {
-        console.log(111111111111)
-        const imageContainer = document.getElementById('imageContainer');
-        const imgElement = document.createElement('img');
-        imgElement.src = imageUrl;
-        imgElement.alt = 'Image';
-        imageContainer.innerHTML = '';
-        imageContainer.appendChild(imgElement);
-    }
+        document.getElementById('getRandomImage').addEventListener('click', function() {
+            fetch('/api/random_image')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob(); // Get the image data as a blob
+                })
+                .then(blob => {
+                    // Convert the image blob to a URL
+                    const imageUrl = URL.createObjectURL(blob);
 
-    // Function to display the classification results graphically
-    function displayResultsGraphically(results) {
-        const labels = Object.keys(results);
-        const probabilities = Object.values(results);
+                    // Create an image element
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    imgElement.alt = 'Random Image';
 
-        // Display the results graphically using Chart.js
-        const ctx = document.getElementById('chart').getContext('2d');
-            // Check if a chart instance already exists
-        // JS - Destroy exiting Chart Instance to reuse <canvas> element
-        let chartStatus = Chart.getChart("chart"); // <canvas> id
-        if (chartStatus != undefined) {
-            chartStatus.destroy();
-        }
-        var char=new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Probability',
-                    data: probabilities,
-                    backgroundColor: 'skyblue',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
+                    // Append the image to the image container
+                    const imageContainer = document.getElementById('imageContainer');
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(imgElement);
+                })
+                .catch(error => {
+                    console.error('Error fetching random image:', error);
+                });
         });
-    }
-
-    // Event listener for the "Get Random Image" button
-    document.getElementById('getRandomImage').addEventListener('click', function() {
-        fetch('http://localhost:5001/api/random_image')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const file = new File([blob], 'random_image.jpg', { type: blob.type });
-                const formData = new FormData();
-                formData.append('image', file);
-
-                const imageUrl = URL.createObjectURL(file);
-                displayImage(imageUrl);
-
-                classifyImage(formData);
-            })
-            .catch(error => {
-                console.error('Error fetching random image:', error);
-            });
-    });
-
-    // Event listener for the file input change
-    document.getElementById('interfaceImageUpload').addEventListener('change', function() {
-        const fileInput = document.getElementById('interfaceImageUpload');
-        const selectedFile = fileInput.files[0];
-        if (selectedFile) {
-            const formData = new FormData();
-            formData.append('image', selectedFile);
-
-            const imageUrl = URL.createObjectURL(selectedFile);
-            displayImage(imageUrl);
-
-            classifyImage(formData);
-        }
-    });
-
-    // Function to classify the image
-    function classifyImage(formData) {
-        console.log("classify")
-        fetch('http://localhost:5002/api/classify_image', {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Image classification response:', data);
-            displayResultsGraphically(data);
-        })
-        .catch(error => {
-            console.error('Error uploading and classifying image:', error);
-        });
-    }
-</script>
+    </script>
 </body>
 </html>
-
