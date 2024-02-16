@@ -52,7 +52,9 @@
 document.getElementById('getRandomImageButton').addEventListener('click', function() {
     fetch('/api/random_image')
         .then(response => {
+            console.log("got a response")
             if (!response.ok) {
+                console.log("a")
                 throw new Error('Network response was not ok');
             }
             // Assuming the response is a Blob representing the image file
@@ -61,6 +63,7 @@ document.getElementById('getRandomImageButton').addEventListener('click', functi
         .then(blob => {
             // Create an object URL from the blob
             const imageUrl = URL.createObjectURL(blob);
+            console.log(imageUrl)
             // Set the src attribute of the img element to the object URL
             const randomImageElement = document.getElementById('randomImage');
             randomImageElement.src = imageUrl;

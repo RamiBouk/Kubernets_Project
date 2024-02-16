@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: database-container
-        image: ramibouk/kube-project-database:1.0
+        image: ramibouk/kube-project-database:latest
         ports:
-        - containerPort: 5002
+        - containerPort: 5001
 ---
 apiVersion: v1
 kind: Service
@@ -28,5 +28,5 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 5002
+    targetPort: 5001
 

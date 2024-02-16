@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: interface-container
-        image: ramibouk/kube-project-interface:1.0
+        image: ramibouk/kube-project-interface:latest
         ports:
         - containerPort: 5000
 

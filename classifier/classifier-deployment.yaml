@@ -14,9 +14,9 @@ spec:
     spec:
       containers:
       - name: classifier-container
-        image: ramibouk/kube-project-classifier:1.0
+        image: ramibouk/kube-project-classifier:latest
         ports:
-        - containerPort: 5001
+        - containerPort: 5002
 ---
 apiVersion: v1
 kind: Service
@@ -28,5 +28,5 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 5001
+    targetPort: 5002
 
